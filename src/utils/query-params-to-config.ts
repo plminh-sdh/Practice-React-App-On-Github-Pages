@@ -75,5 +75,7 @@ export function queryParamsToConfiguration(
   readNumber("rainMaxFontSize");
   readNumber("rainHueSpeed");
 
+  readString("backgroundMusic");
+
   return cfg;
 }
