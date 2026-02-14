@@ -6,7 +6,6 @@ export function useBackgroundMusic(src: string, enabled: boolean) {
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio(src);
-      console.log(audioRef.current);
       audioRef.current.loop = true;
       audioRef.current.volume = 0.5; // tweak volume
     }
