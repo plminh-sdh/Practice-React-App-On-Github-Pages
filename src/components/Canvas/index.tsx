@@ -11,6 +11,7 @@ import {
   rand,
 } from "../../utils/animation-utils";
 import type { Rain } from "../../models/rain";
+import { useBackgroundMusic } from "../../hooks/useBackgroundMusic";
 
 type Props = {
   configuration: Configuration;
@@ -43,6 +44,11 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
 
   const isStartScreen = isPlaying && messageIndex === null;
   const isShowingMessages = isPlaying && messageIndex !== null;
+
+  useBackgroundMusic(
+    "/Practice-React-App-On-Github-Pages/public/background-music.mp3",
+    isShowingMessages,
+  );
 
   const displayText = useMemo(() => {
     if (isStartScreen) return messages[0];
