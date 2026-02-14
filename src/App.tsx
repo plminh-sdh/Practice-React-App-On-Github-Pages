@@ -1,12 +1,10 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 import "./App.css";
-import ConfigurationPage from "./features/display/pages/Configuration";
-import DisplayPage from "./features/display/pages/Display";
 import { routes } from "./routes";
 
 function App() {
-  const browserRouter = createBrowserRouter(routes);
-  return <RouterProvider router={browserRouter} />;
+  const router = createHashRouter(routes);
+  return <RouterProvider router={router} />;
 }
 
 export default App;

@@ -4,8 +4,10 @@ import type { Configuration } from "../../../../models/configuration";
 import { useEffect } from "react";
 import { queryParamsToConfiguration } from "../../../../utils/query-params-to-config";
 import { PageWrapper } from "../Configuration/styles";
+import { useSearchParams } from "react-router-dom";
 
 export default function DisplayPage() {
+  const [searchParams] = useSearchParams();
   const configurationForm = useForm<Configuration>({
     mode: "all",
     criteriaMode: "all",
@@ -41,14 +43,16 @@ export default function DisplayPage() {
   });
 
   useEffect(() => {
-    const search = window.location.search;
-    if (!search) return;
+    if ([...searchParams.keys()].length === 0) return;
 
-    const defaults = configurationForm.getValues(); // current defaults
-    const cfgFromUrl = queryParamsToConfiguration(search, defaults);
+    const defaults = configurationForm.getValues();
+    const cfgFromUrl = queryParamsToConfiguration(
+      searchParams.toString(),
+      defaults,
+    );
 
     configurationForm.reset(cfgFromUrl);
-  }, [configurationForm]);
+  }, [configurationForm, searchParams]);
 
   const configuration = configurationForm.watch();
 

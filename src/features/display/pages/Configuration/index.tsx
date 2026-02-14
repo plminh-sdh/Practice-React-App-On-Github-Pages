@@ -102,7 +102,8 @@ export default function ConfigurationPage() {
     const cfg = configurationForm.getValues();
     const qs = configurationToQueryParams(cfg);
 
-    const url = `${window.location.origin}/display?${qs}`;
+    const base = import.meta.env.BASE_URL || "/";
+    const url = `${window.location.origin}${base}#/display?${qs}`;
     setExportUrl(url);
     setShowQrModal(true);
   }, [configurationForm]);
