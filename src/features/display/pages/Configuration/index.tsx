@@ -116,6 +116,20 @@ export default function ConfigurationPage() {
     setShowQrModal(true);
   }, [configurationForm]);
 
+  const downloadQr = useCallback(() => {
+    const canvas = document.getElementById(
+      "export-qr",
+    ) as HTMLCanvasElement | null;
+    if (!canvas) return;
+
+    const pngUrl = canvas.toDataURL("image/png");
+
+    const a = document.createElement("a");
+    a.href = pngUrl;
+    a.download = "qr-code.png";
+    a.click();
+  }, []);
+
   return (
     <PageWrapper>
       <InputWrapper>
@@ -502,12 +516,13 @@ export default function ConfigurationPage() {
 
       <Canvas configuration={configuration} isPlaying={isPlaying} />
       <SuccessModal
-        title="Title"
+        title="QR Code"
         showModal={showQrModal}
         handleCloseModal={() => setShowQrModal(false)}
       >
         <div style={{ display: "grid", gap: 12, justifyItems: "center" }}>
-          <QRCodeCanvas value={exportUrl} size={220} />
+          <QRCodeCanvas id="export-qr" value={exportUrl} size={220} />
+
           <div
             style={{
               wordBreak: "break-all",
@@ -518,13 +533,23 @@ export default function ConfigurationPage() {
             {exportUrl}
           </div>
 
-          <Button
-            variant="secondary"
-            onClick={() => navigator.clipboard?.writeText(exportUrl)}
-            disabled={!exportUrl}
-          >
-            Copy link
-          </Button>
+          <div style={{ display: "flex", gap: 8 }}>
+            <Button
+              variant="secondary"
+              onClick={() => navigator.clipboard?.writeText(exportUrl)}
+              disabled={!exportUrl}
+            >
+              Copy link
+            </Button>
+
+            <Button
+              variant="primary"
+              onClick={downloadQr}
+              disabled={!exportUrl}
+            >
+              Download QR
+            </Button>
+          </div>
         </div>
       </SuccessModal>
     </PageWrapper>
