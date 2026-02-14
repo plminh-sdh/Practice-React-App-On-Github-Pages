@@ -46,6 +46,7 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
   const isShowingMessages = isPlaying && messageIndex !== null;
 
   const bgMusicUrl = `${import.meta.env.BASE_URL}background-music.mp3`;
+  console.log("Base url", import.meta.env.BASE_URL);
   useBackgroundMusic(bgMusicUrl, isShowingMessages);
 
   const displayText = useMemo(() => {

@@ -28,8 +28,6 @@ export function queryParamsToConfiguration(
   // Helper to read string[] (messages)
   const readStringArray = (key: keyof Configuration) => {
     const values = params.getAll(String(key));
-    console.log(key);
-    console.log(values);
     if (values.length > 0) {
       // @ts-expect-error – dynamic assignment
       cfg[key] = values as any;
