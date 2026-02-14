@@ -13,8 +13,13 @@ import { InputWrapper, PageWrapper } from "./styles";
 import { FontOptions } from "../../values/font-option";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { FontWeightOptions } from "../../values/font-weight-options";
+import { configurationToQueryParams } from "../../../../utils/config-to-query-params";
+import SuccessModal from "../../../../components/SuccessModal";
+import { QRCodeCanvas } from "qrcode.react";
 
 export default function ConfigurationPage() {
+  const [showQrModal, setShowQrModal] = useState(false);
+  const [exportUrl, setExportUrl] = useState<string>("");
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -92,6 +97,15 @@ export default function ConfigurationPage() {
       });
     });
   }, [setIsPlaying]);
+
+  const exportConfig = useCallback(() => {
+    const cfg = configurationForm.getValues();
+    const qs = configurationToQueryParams(cfg);
+
+    const url = `${window.location.origin}/display?${qs}`;
+    setExportUrl(url);
+    setShowQrModal(true);
+  }, [configurationForm]);
 
   return (
     <PageWrapper>
@@ -379,12 +393,42 @@ export default function ConfigurationPage() {
               >
                 Stop Play
               </Button>
+
+              <Button className="w-25 my-0 ms-3" onClick={exportConfig}>
+                Export Configs
+              </Button>
             </Row>
           </Container>
         </FormProvider>
       </InputWrapper>
 
       <Canvas configuration={configuration} isPlaying={isPlaying} />
+      <SuccessModal
+        title="Title"
+        showModal={showQrModal}
+        handleCloseModal={() => setShowQrModal(false)}
+      >
+        <div style={{ display: "grid", gap: 12, justifyItems: "center" }}>
+          <QRCodeCanvas value={exportUrl} size={220} />
+          <div
+            style={{
+              wordBreak: "break-all",
+              textAlign: "center",
+              maxWidth: 360,
+            }}
+          >
+            {exportUrl}
+          </div>
+
+          <Button
+            variant="secondary"
+            onClick={() => navigator.clipboard?.writeText(exportUrl)}
+            disabled={!exportUrl}
+          >
+            Copy link
+          </Button>
+        </div>
+      </SuccessModal>
     </PageWrapper>
   );
 }

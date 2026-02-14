@@ -368,11 +368,8 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
           p.y = p.destinationY;
         }
 
-        console.log("Endingg");
-
         if (!morphEndedRef.current) {
           morphEndedRef.current = true;
-          console.log("Advancing");
 
           // advance message (only if we are in message mode)
           if (isShowingMessages) {
