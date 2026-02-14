@@ -24,4 +24,12 @@ export interface Configuration {
 
   transitionDuration?: number;
   transitionRadius?: number;
+
+  rainMessages?: string[];
+  rainDensity?: number;
+  rainMinSpeed?: number;
+  rainMaxSpeed?: number;
+  rainMinFontSize?: number;
+  rainMaxFontSize?: number;
+  rainHueSpeed?: number;
 }

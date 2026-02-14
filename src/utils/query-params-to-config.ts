@@ -69,5 +69,13 @@ export function queryParamsToConfiguration(
   readNumber("transitionDuration");
   readNumber("transitionRadius");
 
+  readStringArray("rainMessages");
+  readNumber("rainDensity");
+  readNumber("rainMinSpeed");
+  readNumber("rainMaxSpeed");
+  readNumber("rainMinFontSize");
+  readNumber("rainMaxFontSize");
+  readNumber("rainHueSpeed");
+
   return cfg;
 }

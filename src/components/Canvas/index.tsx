@@ -10,6 +10,7 @@ import {
   lerp,
   rand,
 } from "../../utils/animation-utils";
+import type { Rain } from "../../models/rain";
 
 type Props = {
   configuration: Configuration;
@@ -23,6 +24,8 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
   const dprRef = useRef(1);
   const particlesRef = useRef<Particle[]>([]);
   const originalParticlesRef = useRef<Particle[]>([]);
+  const rainRef = useRef<Rain[]>([]);
+  const rainHueRef = useRef(0);
 
   const rafIdRef = useRef<number | null>(null);
   const isRunningRef = useRef(false);
@@ -32,6 +35,7 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
     phase0Committed: false,
   });
   const morphEndedRef = useRef(false);
+  const lastTickTimeRef = useRef<number | null>(null);
 
   const [messageIndex, setMessageIndex] = useState<number | null>(null);
 
@@ -143,11 +147,43 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
     [configuration],
   );
 
+  const rainMessages = useMemo(
+    () =>
+      configuration.rainMessages?.length
+        ? configuration.rainMessages
+        : ["HELLO"],
+    [configuration],
+  );
+
+  const rainDensity = useMemo(
+    () => configuration.rainDensity ?? 3,
+    [configuration],
+  );
+
+  const rainMinSpeed = useMemo(
+    () => configuration.rainMinSpeed ?? 1,
+    [configuration],
+  );
+  const rainMaxSpeed = useMemo(
+    () => configuration.rainMinSpeed ?? 1,
+    [configuration],
+  );
+  const rainMinFontSize = useMemo(
+    () => configuration.rainMinFontSize ?? 12,
+    [configuration],
+  );
+  const rainMaxFontSize = useMemo(
+    () => configuration.rainMaxFontSize ?? 24,
+    [configuration],
+  );
+
+  const rainHueSpeed = useMemo(
+    () => configuration.rainHueSpeed ?? 20,
+    [configuration],
+  );
+
   // small unique jitter to avoid exact overlaps
   const EPS = 0.35; // <= sub-pixel jitter is enough
-
-  const jitterX = (Math.random() - 0.5) * EPS;
-  const jitterY = (Math.random() - 0.5) * EPS;
 
   const clearRect = useCallback(() => {
     const context = contextRef.current;
@@ -252,6 +288,9 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
       p.destinationX = x;
       p.destinationY = y;
 
+      const jitterX = (Math.random() - 0.5) * EPS;
+      const jitterY = (Math.random() - 0.5) * EPS;
+
       // Ensure start positions (current pos)
       p.startX = p.x;
       p.startY = p.y;
@@ -343,6 +382,92 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
 
     convertToParticles();
   }, [clearRect, paintText, convertToParticles]);
+
+  const spawnRain = useCallback(() => {
+    const { w } = sizeRef.current;
+
+    if (Math.random() * 100 > rainDensity) return;
+
+    const msg = rainMessages[Math.floor(Math.random() * rainMessages.length)];
+    const fontSize =
+      rainMinFontSize + Math.random() * (rainMaxFontSize - rainMinFontSize);
+    const speed = rainMinSpeed + Math.random() * (rainMaxSpeed - rainMinSpeed);
+
+    rainRef.current.push({
+      x: Math.random() * w,
+      y: 0,
+      message: msg,
+      fontSize,
+      speed,
+    });
+  }, [
+    rainDensity,
+    rainMessages,
+    rainMinFontSize,
+    rainMaxFontSize,
+    rainMinSpeed,
+    rainMaxSpeed,
+  ]);
+
+  const drawRain = useCallback(
+    (dt: number) => {
+      const ctx = contextRef.current;
+      if (!ctx) return;
+
+      const { h } = sizeRef.current;
+
+      ctx.shadowBlur = 0;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+
+      const next: Rain[] = [];
+      clearRect();
+      const hue = rainHueRef.current;
+
+      for (const drop of rainRef.current) {
+        drop.y += drop.speed * dt;
+
+        ctx.font = `${drop.fontSize}px ${configuration.font}`;
+
+        const chars = drop.message.split("");
+        const charSpacing = drop.fontSize * 0.2;
+        const stepY = drop.fontSize + charSpacing;
+
+        // bottom char is at drop.y
+        const topCharY = drop.y - (chars.length - 1) * stepY;
+
+        // width of the fading column
+        const padX = drop.fontSize * 0.7;
+
+        // LOOP TOP -> BOTTOM (important for stacking)
+        for (let i = 0; i < chars.length; i++) {
+          const y = topCharY + i * stepY;
+
+          // 1) draw the character
+          const lightness = 50 + (i / chars.length) * 30;
+          ctx.fillStyle = `hsl(${hue} 100% ${lightness}%)`;
+          ctx.fillText(chars[i], drop.x, y);
+
+          // 2) apply fade from THIS character up to the top character
+          // lower letters will apply this rect again, darkening top more times
+          ctx.fillStyle = "rgba(0,0,0,0.12)";
+          ctx.fillRect(
+            drop.x - padX,
+            topCharY - drop.fontSize, // a bit above the top char
+            padX * 2,
+            y - (topCharY - drop.fontSize) + drop.fontSize * 0.2,
+          );
+        }
+
+        // keep if still visible
+        const totalHeight = (chars.length - 1) * stepY + drop.fontSize;
+        if (topCharY < h + totalHeight) next.push(drop);
+      }
+
+      rainRef.current = next;
+    },
+    [configuration.font, clearRect],
+  );
 
   const updateFrame = useCallback(
     (now: number) => {
@@ -469,7 +594,6 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
   const drawFrame = useCallback(() => {
     const context = contextRef.current;
     if (!context) return;
-    clearRect();
     context.fillStyle = "#fff";
     context.shadowColor = "#fff";
     context.shadowBlur = 5;
@@ -491,13 +615,22 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
     const tick = (now: number) => {
       if (!isRunningRef.current) return;
 
+      const last = lastTickTimeRef.current ?? now;
+      const dt = (now - last) / 1000; // seconds
+      lastTickTimeRef.current = now;
+      rainHueRef.current = (rainHueRef.current + rainHueSpeed * dt) % 360;
+
+      spawnRain();
+      drawRain(dt);
+
       updateFrame(now);
       drawFrame();
+
       rafIdRef.current = requestAnimationFrame(tick);
     };
 
     rafIdRef.current = requestAnimationFrame(tick);
-  }, [updateFrame, drawFrame]);
+  }, [updateFrame, drawFrame, spawnRain, drawRain, rainHueSpeed]);
 
   const stopAnimation = useCallback(() => {
     isRunningRef.current = false;
@@ -629,6 +762,7 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
       stopAnimation();
       clearRect();
       particlesRef.current = [];
+      rainRef.current = [];
       repaint();
       paintStartText();
       return;

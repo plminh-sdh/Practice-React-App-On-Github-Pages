@@ -54,6 +54,14 @@ export default function ConfigurationPage() {
 
       transitionDuration: 1000,
       transitionRadius: 50,
+
+      rainMessages: ["VALENTINE", "14/02"],
+      rainDensity: 80,
+      rainMinSpeed: 500,
+      rainMaxSpeed: 2000,
+      rainMinFontSize: 10,
+      rainMaxFontSize: 15,
+      rainHueSpeed: 10,
     },
   });
 
@@ -132,18 +140,6 @@ export default function ConfigurationPage() {
                   />
                 </LabelledInputWrapper>
               </Col>
-            </Row>
-
-            <Row className="mt-3">
-              <LabelledInputWrapper name="text" label="Messages">
-                <TextListInputRHF
-                  name="messages"
-                  placeholder="Enter your message here"
-                  selectedRowIndex={selectedRowIndex}
-                  setSelectedRowIndex={setSelectedRowIndex}
-                  disabled={isPlaying}
-                />
-              </LabelledInputWrapper>
             </Row>
 
             <Row>
@@ -378,6 +374,107 @@ export default function ConfigurationPage() {
                 </LabelledInputWrapper>
               </Col>
             </Row>
+
+            <Row className="mt-3">
+              <LabelledInputWrapper name="text" label="Rain Messages">
+                <TextListInputRHF
+                  name="rainMessages"
+                  placeholder="Enter your message here"
+                  selectedRowIndex={null}
+                  setSelectedRowIndex={() => {}}
+                  disabled={isPlaying}
+                />
+              </LabelledInputWrapper>
+            </Row>
+
+            <Row className="mt-3">
+              <Col>
+                <LabelledInputWrapper name="rainDensity" label="Rain Density">
+                  <PositiveIntegerInputRHF
+                    name="rainDensity"
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+
+              <Col className="ps-5">
+                <LabelledInputWrapper
+                  name="rainMinSpeed"
+                  label="Rain Min Speed"
+                >
+                  <PositiveIntegerInputRHF
+                    name="rainMinSpeed"
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+
+              <Col className="ps-5">
+                <LabelledInputWrapper
+                  name="rainMaxSpeed"
+                  label="Rain Max Speed"
+                >
+                  <PositiveIntegerInputRHF
+                    name="rainMaxSpeed"
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col>
+                <LabelledInputWrapper
+                  name="rainMinFontSize"
+                  label="Rain Min Font Size"
+                >
+                  <PositiveIntegerInputRHF
+                    name="rainMinFontSize"
+                    max={200}
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+
+              <Col className="ps-5">
+                <LabelledInputWrapper
+                  name="rainMaxFontSize"
+                  label="Rain Max Font Size"
+                >
+                  <PositiveIntegerInputRHF
+                    name="rainMaxFontSize"
+                    max={200}
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+
+              <Col className="ps-5">
+                <LabelledInputWrapper
+                  name="rainHueSpeed"
+                  label="Rain Hue Speed"
+                >
+                  <PositiveIntegerInputRHF
+                    name="rainHueSpeed"
+                    max={200}
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <LabelledInputWrapper name="text" label="Messages">
+                <TextListInputRHF
+                  name="messages"
+                  placeholder="Enter your message here"
+                  selectedRowIndex={selectedRowIndex}
+                  setSelectedRowIndex={setSelectedRowIndex}
+                  disabled={isPlaying}
+                />
+              </LabelledInputWrapper>
+            </Row>
+
             <Row className="mt-3 justify-content-center">
               <Button
                 className="w-25 my-0"

@@ -39,6 +39,14 @@ export default function DisplayPage() {
 
       transitionDuration: 1000,
       transitionRadius: 50,
+
+      rainMessages: ["VALENTINE", "14/02"],
+      rainDensity: 80,
+      rainMinSpeed: 500,
+      rainMaxSpeed: 2000,
+      rainMinFontSize: 10,
+      rainMaxFontSize: 15,
+      rainHueSpeed: 10,
     },
   });
 
