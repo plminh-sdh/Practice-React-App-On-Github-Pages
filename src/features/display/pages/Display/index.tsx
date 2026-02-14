@@ -47,6 +47,8 @@ export default function DisplayPage() {
       rainMinFontSize: 10,
       rainMaxFontSize: 15,
       rainHueSpeed: 10,
+
+      backgroundMusic: "background-music.mp3",
     },
   });
 

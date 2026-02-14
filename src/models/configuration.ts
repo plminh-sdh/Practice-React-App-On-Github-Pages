@@ -32,4 +32,6 @@ export interface Configuration {
   rainMinFontSize?: number;
   rainMaxFontSize?: number;
   rainHueSpeed?: number;
+
+  backgroundMusic: string;
 }

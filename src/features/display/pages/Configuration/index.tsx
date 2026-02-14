@@ -16,6 +16,7 @@ import { FontWeightOptions } from "../../values/font-weight-options";
 import { configurationToQueryParams } from "../../../../utils/config-to-query-params";
 import SuccessModal from "../../../../components/SuccessModal";
 import { QRCodeCanvas } from "qrcode.react";
+import { BackgroundMusicOptions } from "../../values/background-music-option";
 
 export default function ConfigurationPage() {
   const [showQrModal, setShowQrModal] = useState(false);
@@ -62,6 +63,8 @@ export default function ConfigurationPage() {
       rainMinFontSize: 10,
       rainMaxFontSize: 15,
       rainHueSpeed: 10,
+
+      backgroundMusic: "background-music.mp3",
     },
   });
 
@@ -383,6 +386,22 @@ export default function ConfigurationPage() {
                 >
                   <PositiveIntegerInputRHF
                     name="sideInwardMax"
+                    disabled={isPlaying}
+                  />
+                </LabelledInputWrapper>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col>
+                <LabelledInputWrapper
+                  name="backgroundMusic"
+                  label="Background Music"
+                >
+                  <DropDownInputRHF
+                    name="backgroundMusic"
+                    options={BackgroundMusicOptions}
+                    withSearch
                     disabled={isPlaying}
                   />
                 </LabelledInputWrapper>
