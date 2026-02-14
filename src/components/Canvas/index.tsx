@@ -45,10 +45,8 @@ export default function Canvas({ configuration, isPlaying }: Readonly<Props>) {
   const isStartScreen = isPlaying && messageIndex === null;
   const isShowingMessages = isPlaying && messageIndex !== null;
 
-  useBackgroundMusic(
-    "/Practice-React-App-On-Github-Pages/public/background-music.mp3",
-    isShowingMessages,
-  );
+  const bgMusicUrl = `${import.meta.env.BASE_URL}background-music.mp3`;
+  useBackgroundMusic(bgMusicUrl, isShowingMessages);
 
   const displayText = useMemo(() => {
     if (isStartScreen) return messages[0];
